@@ -1,6 +1,6 @@
 # microservices
 
-@@ The registry
+## The registry
 
 Simply at EnableEureakaServer to:
 
@@ -10,7 +10,7 @@ Then configure the registry:
 
 https://github.com/charroux/microservices/blob/main/registry/src/main/resources/application.yml
 
-@ First microservice
+## First microservice
 
 https://github.com/charroux/microservices/blob/main/microservice1/src/main/java/com/example/microservice1/RestService.java
 
@@ -18,7 +18,7 @@ Registering configuration:
 
 https://github.com/charroux/microservices/blob/main/microservice1/src/main/resources/application.yml
 
-@ Second microservice
+## Second microservice
 
 https://github.com/charroux/microservices/blob/main/microservice2/src/main/java/com/example/microservice2/RestService.java
 
