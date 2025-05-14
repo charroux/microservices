@@ -21,17 +21,16 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
       />
       <section class="listing-description">
         <h2 class="listing-heading">{{ cardetail?.brand }}</h2>
-        <p class="listing-location">{{ cardetail?.price }}, {{ cardetail?.price }}</p>
       </section>
       <section class="listing-features">
-        <h2 class="section-heading">About this housing location</h2>
+        <h2 class="section-heading">About this car</h2>
         <ul>
-          <li>Units available: {{ cardetail?.price }}</li>
-          <li>Does this location have wifi: {{ cardetail?.price }}</li>
+          <li>Horsepower : {{ cardetail?.horsepower }}</li>
+          <li>Price: {{ cardetail?.price }}</li>
         </ul>
       </section>
       <section class="listing-apply">
-        <h2 class="section-heading">Apply now to live here</h2>
+        <h2 class="section-heading">Apply now to rent it</h2>
         <form [formGroup]="applyForm" (submit)="submitApplication()">
           <label for="first-name">First Name</label>
           <input id="first-name" type="text" formControlName="firstName" />
@@ -39,6 +38,10 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
           <input id="last-name" type="text" formControlName="lastName" />
           <label for="email">Email</label>
           <input id="email" type="email" formControlName="email" />
+          <label for="begin-date">Begin Date</label>
+          <input id="begin-date" type="text" formControlName="beginDate" />
+          <label for="end-date">End Date</label>
+          <input id="end-date" type="text" formControlName="endDate" />
           <button type="submit" class="primary">Apply now</button>
         </form>
       </section>
@@ -54,7 +57,9 @@ export class DetailsComponent {
   applyForm = new FormGroup({
     firstName: new FormControl(''),
     lastName: new FormControl(''),
-    email: new FormControl('')
+    email: new FormControl(''),
+    beginDate: new FormControl(''),
+    endDate: new FormControl(''),
   });
 
   constructor() {
@@ -64,17 +69,14 @@ export class DetailsComponent {
     });
   }
 
-  /*constructor() {
-    console.log('oooooookkkkkkkk',);
-    const cardetailPlateNumber = String(this.route.snapshot.params['plateNumber']);
-    this.cardetail = this.rentalService.getAllCarsByPlateNumber(cardetailPlateNumber);
-  }*/
   submitApplication() {
-    console.log('oookkkk');
     this.rentalService.submitApplication(
       this.applyForm.value.firstName ?? '',
       this.applyForm.value.lastName ?? '',
-      this.applyForm.value.email ?? ''
+      this.applyForm.value.email ?? '',
+      this.applyForm.value.beginDate ?? '',
+      this.applyForm.value.endDate ?? '',
+      this.cardetail?.plateNumber ?? ''
     );
   }
 }

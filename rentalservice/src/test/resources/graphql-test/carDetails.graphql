@@ -1,7 +1,0 @@
-query carDetails {
-    carById(id: "AA11BB") {
-        plateNumber
-        brand
-        price
-    }
-}

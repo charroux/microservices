@@ -3,4 +3,5 @@ export interface Cardetail {
     brand: string;
     price: number;
     photo: string;
+    horsepower: number;
 }

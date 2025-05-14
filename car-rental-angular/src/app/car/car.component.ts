@@ -1,6 +1,7 @@
-import {Component, inject} from '@angular/core';
+import {Component, OnInit, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RentalService} from '../rental.service';
+import { Subscription } from 'rxjs';
 import {CarDetailComponent} from '../car-detail/car-detail.component';
 import {Cardetail} from '../cardetail';
 
@@ -20,21 +21,19 @@ import {Cardetail} from '../cardetail';
       `,
       styleUrls: ['./car.component.css'],
 })
-export class CarComponent {
+export class CarComponent implements OnInit {
   readonly baseUrl = 'https://angular.dev/assets/images/tutorials/common';
   cardetailList: Cardetail[] = [];
   filteredCarList: Cardetail[] = [];
   rentalService: RentalService = inject(RentalService);
+  private subscription!: Subscription;
+
+  ngOnInit() {
+    this.subscription = this.rentalService.getAllCars().subscribe(cars => { this.cardetailList = cars; this.filteredCarList = cars; });
+    }
   
-  constructor() {
-    this.rentalService.getAllCars().then((carList: Cardetail[]) => {
-      this.cardetailList = carList;
-      this.filteredCarList = carList;
-    });
-    //this.cardetailList = this.rentalService.getAllCars();
-    //this.filteredCarList = this.cardetailList;
-  }
   filterResults(text: string) {
+    console.log(text);
     if (!text) {
       this.filteredCarList = this.cardetailList;
       return;
@@ -42,6 +41,10 @@ export class CarComponent {
     this.filteredCarList = this.cardetailList.filter(
       cardetail => cardetail?.brand.toLowerCase().includes(text.toLowerCase())
     );
+  }
+
+  ngOnDestroy(): void {
+    this.subscription?.unsubscribe();
   }
 }
 
