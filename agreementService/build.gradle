@@ -19,7 +19,7 @@ version = '0.0.1-SNAPSHOT'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -28,9 +28,9 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-	implementation "io.grpc:grpc-stub:${grpcVersion}"
+	api 'org.springframework.boot:spring-boot-starter'
+	api "io.grpc:grpc-protobuf:${grpcVersion}"
+	api "io.grpc:grpc-stub:${grpcVersion}"
 	compileOnly 'jakarta.annotation:jakarta.annotation-api:1.3.5'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

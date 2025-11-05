@@ -23,9 +23,8 @@ export class RentalService {
     );
   }  
 
-  async getAllCarsByPlateNumber(plateNumber: string): Promise<Cardetail | undefined> {
-    const data = await fetch(`${this.url}/${plateNumber}`);
-    return await data.json() ?? {};
+  getAllCarsByPlateNumber(plateNumber: string): Observable<Cardetail> {
+    return this.http.get<Cardetail>(`${this.url}/${plateNumber}`);
   }
 
   submitApplication(firstName: string, lastName: string, email: string, beginDate: string, endDate: string, plateNumber: string): void {

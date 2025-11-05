@@ -5,6 +5,7 @@ import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-car-detail',
+  standalone: true,
   imports: [RouterLink, CommonModule],
   template: `
     <section class="listing">

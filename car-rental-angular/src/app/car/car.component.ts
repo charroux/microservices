@@ -7,6 +7,7 @@ import {Cardetail} from '../cardetail';
 
 @Component({
   selector: 'app-car',
+  standalone: true,
   imports: [CommonModule, CarDetailComponent],
   template: `
     <section>

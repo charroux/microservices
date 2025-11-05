@@ -7,6 +7,7 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-details',
+  standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule
@@ -64,7 +65,7 @@ export class DetailsComponent {
 
   constructor() {
     const cardetailPlateNumber = String(this.route.snapshot.params['plateNumber']);
-    this.rentalService.getAllCarsByPlateNumber(cardetailPlateNumber).then(cardetail => {
+    this.rentalService.getAllCarsByPlateNumber(cardetailPlateNumber).subscribe(cardetail => {
       this.cardetail = cardetail;
     });
   }

@@ -428,54 +428,67 @@ eval $(minikube docker-env)
 
 ## Build the Docker images (optional)
 
-Dockers images have been alreaddy build. You can find those images in the Docker hub : 
+Docker images for the services can be built locally. New Dockerfiles have been added to the repository:
 
-https://hub.docker.com/search?q=charroux
+- `carRental/Dockerfile` — multi-stage builder (Gradle + JDK 21) and runtime (Temurin JRE).
+- `agreementService/Dockerfile` — builds the agreement service artifacts and packages them.
+- `agreementServiceServer/Dockerfile` — builds the gRPC server service.
+- `Dockerfile.multi` — multi-target Dockerfile at repository root with targets `carRental` and `postgres`.
 
-So you can skip the next steps.
+You can also find some images published to Docker Hub under the `charroux` namespace; if you prefer to use those, update the manifests in `k8s/` accordingly.
 
-Build the postgres image:
+Examples — build and push to your registry (replace `charroux` with your registry/namespace):
+
+Build the car-rental image (single-service Dockerfile):
+```bash
+docker build -f carRental/Dockerfile -t charroux/car-rental:latest .
+docker push charroux/car-rental:latest
 ```
-docker build --tag=charroux/postgres:1 postgres
-docker push charroux/postgres:1
+
+Build the agreement-service image:
+```bash
+docker build -f agreementService/Dockerfile -t charroux/agreement-service:latest .
+docker push charroux/agreement-service:latest
 ```
-Build the carservice app:
+
+Build the agreement-service-server image:
+```bash
+docker build -f agreementServiceServer/Dockerfile -t charroux/agreement-service-server:latest .
+docker push charroux/agreement-service-server:latest
 ```
-cd carservice
-./gradlew build
-cd ..
-docker build --tag=charroux/carservice:1 carservice
-docker push charroux/carservice:1  
+
+Build the car-rental image using the multi-target root Dockerfile (alternate):
+```bash
+# build only the carRental target from Dockerfile.multi
+docker build -f Dockerfile.multi --target carRental -t charroux/car-rental:latest .
+docker push charroux/car-rental:latest
 ```
-Build the carstat app:
+
+Build a custom Postgres image (optional, includes init scripts if present):
+```bash
+docker build -f Dockerfile.multi --target postgres -t charroux/postgres:15 .
+docker push charroux/postgres:15
 ```
-cd carstat
-./gradlew build
-cd ..
-docker build --tag=charroux/carstat:1 carstat  
-docker push charroux/carstat:1  
+
+Quick dev using Docker Compose
+---------------------------------
+For local development it's often faster to use Docker Compose. Create a `docker-compose.yml` that starts Postgres and the `car-rental` image and mounts local resources as needed. Example snippet (not included here) should:
+
+- start a Postgres container with the same credentials as `application-prod.properties` or use env overrides,
+- build or pull the `charroux/car-rental:latest` image,
+- expose port 8080 for local testing.
+
+Kubernetes
+-----------
+After building and pushing images, update `k8s/` manifests if you used different image names/tags and apply them:
+```bash
+kubectl apply -k k8s/
 ```
-Build the customer app:
-```
-cd customer
-./gradlew build
-cd ..
-docker build --tag=charroux/customer:1 customer  
-docker push charroux/customer:1  
-```
-Build the graphQL app:
-```
-cd rentalservice
-./gradlew build
-cd ..
-docker build --tag=charroux/rentalservice:1 rentalservice  
-docker push charroux/rentalservice:1  
-```
-Build the React app:
-```
-docker build --tag=charroux/carental:1 carental
-docker push charroux/carental:1 
-```
+
+Notes
+- The Dockerfiles are multi-stage and run the Gradle build inside the builder image. For CI you may prefer building the jar artifact in the CI runner and then creating a smaller runtime image from it.
+- The builder images (e.g. `gradle:8.6-jdk21`) may trigger vulnerability warnings in scanners; it's recommended to scan images in your CI and choose minimal runtime images for production (distroless, slim, or jlink-based images).
+- Replace any example credentials or base64 secrets before deploying to production.
 
 
 # cloud-native-app

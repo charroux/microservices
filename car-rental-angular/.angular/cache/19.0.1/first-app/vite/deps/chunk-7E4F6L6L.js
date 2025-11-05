@@ -46,7 +46,6 @@ import {
   untracked,
   unwrapSafeValue,
   whenStable,
-  ɵɵInputTransformsFeature,
   ɵɵNgOnChangesFeature,
   ɵɵdefineDirective,
   ɵɵdefineInjectable,
@@ -4676,7 +4675,7 @@ var NgOptimizedImage = class _NgOptimizedImage {
       src: "src",
       srcset: "srcset"
     },
-    features: [ɵɵInputTransformsFeature, ɵɵNgOnChangesFeature]
+    features: [ɵɵNgOnChangesFeature]
   });
 };
 (() => {
@@ -5150,4 +5149,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-SJO2QKKA.js.map
+//# sourceMappingURL=chunk-7E4F6L6L.js.map
