@@ -517,11 +517,17 @@ cp .env.dev .env
 # edit .env to change POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB if needed
 ```
 
-2. Start the stack (build images and run Postgres + car-rental + agreement-service):
+2. Start the stack (build images and run all services):
 
 ```bash
-docker compose -f docker-compose.dev.yml up --build
+docker compose -f docker-compose.dev.yml --env-file .env.dev up
 ```
+
+This command:
+- Uses development environment variables from `.env.dev`
+- Starts PostgreSQL database
+- Starts car-rental service (REST API)
+- Starts agreement-service (gRPC)
 
 This will:
 - Build and start the Postgres database
@@ -531,9 +537,8 @@ This will:
 3. Run in detached mode:
 
 ```bash
-docker compose -f docker-compose.dev.yml --env-file .env.dev up --build -d
+docker compose -f docker-compose.dev.yml --env-file .env.dev up -d
 ```
-
 4. View logs:
 
 ```bash
@@ -543,14 +548,24 @@ docker compose -f docker-compose.dev.yml logs -f car-rental
 5. Stop and remove containers:
 
 ```bash
-docker compose -f docker-compose.dev.yml down
+docker compose -f docker-compose.dev.yml --env-file .env.dev down
 ```
 
-Rebuild only the car-rental image (no Postgres rebuild):
+Note: Add `-v` flag to also remove volumes (this will delete persistent data):
+```bash
+docker compose -f docker-compose.dev.yml --env-file .env.dev down -v
+```
+
+Rebuild specific services:
 
 ```bash
-docker compose -f docker-compose.dev.yml build car-rental
-docker compose -f docker-compose.dev.yml up -d
+# Rebuild single service
+docker compose -f docker-compose.dev.yml --env-file .env.dev build car-rental
+docker compose -f docker-compose.dev.yml --env-file .env.dev up -d
+
+# Rebuild all services
+docker compose -f docker-compose.dev.yml --env-file .env.dev build
+docker compose -f docker-compose.dev.yml --env-file .env.dev up -d
 ```
 
 What this compose file does

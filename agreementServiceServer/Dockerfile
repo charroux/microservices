@@ -1,14 +1,19 @@
 # Multi-stage Dockerfile for agreementServiceServer
-# Builder stage: use the official Gradle image with JDK 21
 FROM gradle:8.6-jdk21 AS builder
+
 WORKDIR /home/gradle/project
+# Copy the project files
 COPY . .
-WORKDIR /home/gradle/project/agreementServiceServer
-# Build the Spring Boot jar
-RUN ./gradlew clean bootJar -x test --no-daemon
+# Build the project
+RUN chmod +x ./gradlew && \
+    ./gradlew :agreementServiceServer:bootJar -x test --no-daemon
 
 # Runtime stage
 FROM eclipse-temurin:21-jre
+
+# Install netcat for healthcheck
+RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder /home/gradle/project/agreementServiceServer/build/libs/*.jar /app/app.jar
-EXPOSE 8080
+EXPOSE 9090
 ENTRYPOINT ["java","-jar","/app/app.jar"]

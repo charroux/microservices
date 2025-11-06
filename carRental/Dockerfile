@@ -2,11 +2,11 @@
 # Builder stage: use the official Gradle image with JDK 21
 FROM gradle:8.6-jdk21 AS builder
 WORKDIR /home/gradle/project
-# Copy the whole repo (for monorepo builds); build only the carRental module
+# Copy the whole repo for multi-module build
 COPY . .
-WORKDIR /home/gradle/project/carRental
-# Build the Spring Boot jar (skip tests to speed up image builds; remove -x test for CI builds)
-RUN ./gradlew clean bootJar -x test --no-daemon
+# Build the Spring Boot jar from root project
+RUN chmod +x ./gradlew && \
+    ./gradlew :carRental:bootJar -x test --no-daemon
 
 # Runtime stage: small JRE image
 FROM eclipse-temurin:21-jre
