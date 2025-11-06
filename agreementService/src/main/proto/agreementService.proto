@@ -2,12 +2,16 @@ syntax = "proto3";
 
 package com.charroux;
 
+import "google/protobuf/empty.proto";
+
 option java_multiple_files = true;
 option java_package = "com.charroux.lib";
 option java_outer_classname = "AgreementServiceProto";
 
 service AgreementService {
-  rpc RentCars(stream CreditApplication) returns (stream Agreement) {}
+  rpc RentCars(stream CreditApplication) returns (stream Agreement);
+  rpc CarAuction(stream Bidding) returns (stream BidResponse);
+  rpc CarsToBeRented(google.protobuf.Empty) returns (CarToBeRented);
 }
 
 message CreditApplication {
@@ -19,4 +23,30 @@ message CreditApplication {
 
 message Agreement {
   string creditReservedEvent = 1;
+}
+
+message Bidding {
+  Car car = 1;
+  Bidder bidder = 2;
+  uint32 amount = 3;
+}
+
+message BidResponse {
+  bool awarded = 1;
+  string plateNumber = 2;
+  uint32 latestBidding = 3;
+}
+
+message Car {
+  string brand = 1;
+  string model = 2;
+  string plateNumber = 3; // Added plateNumber to Car message
+}
+
+message Bidder {
+  uint32 id = 1;
+}
+
+message CarToBeRented {
+  repeated Car cars = 1;
 }

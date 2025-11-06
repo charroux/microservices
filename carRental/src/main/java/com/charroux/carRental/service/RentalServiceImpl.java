@@ -7,12 +7,16 @@ import com.charroux.carRental.entity.RentalAgreementRepository;
 import com.charroux.carRental.web.CarNotFoundException;
 import com.charroux.lib.Agreement;
 import com.charroux.lib.CreditApplication;
+import com.charroux.lib.CarToBeRented;
 import com.charroux.lib.AgreementServiceGrpc;
+import com.google.protobuf.Empty;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import org.slf4j.Logger;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,17 +35,78 @@ public class RentalServiceImpl implements RentalService {
 
     CarRepository carRepository;
     RentalAgreementRepository rentalAgreementRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    Logger logger = org.slf4j.LoggerFactory.getLogger(RentalServiceImpl.class);
 
     @Autowired
-    public RentalServiceImpl(CarRepository carRepository, RentalAgreementRepository rentalAgreementRepository) {
+    public RentalServiceImpl(CarRepository carRepository,
+                             RentalAgreementRepository rentalAgreementRepository,
+                             @Value("${CUSTOMER.SERVICE.HOST}") String customerHost,
+                             @Value("${CUSTOMER.SERVICE.PORT}") String customerPost,
+                             SimpMessagingTemplate messagingTemplate) {
         super();
         this.carRepository = carRepository;
         this.rentalAgreementRepository = rentalAgreementRepository;
+        this.messagingTemplate = messagingTemplate;
+        // assign injected host/port values
+        this.customerHost = customerHost;
+        this.customerPost = customerPost;
+
+        // On construction, fetch list of cars available from AgreementService and persist them
+        try {
+            final ManagedChannel channel = ManagedChannelBuilder.forTarget(this.customerHost + ":" + this.customerPost)
+                    .usePlaintext()
+                    .build();
+            AgreementServiceGrpc.AgreementServiceBlockingStub blockingStub = AgreementServiceGrpc.newBlockingStub(channel);
+            CarToBeRented available = blockingStub.carsToBeRented(Empty.getDefaultInstance());
+            if (available != null) {
+                for (com.charroux.lib.Car protoCar : available.getCarsList()) {
+                    // Map proto fields to JPA entity. Use `model` as plateNumber if present.
+                    String plate = protoCar.getModel();
+                    String brand = protoCar.getBrand();
+                    // Avoid inserting duplicates by plate number
+                    boolean exists = !carRepository.findByPlateNumber(plate).isEmpty();
+                    if (!exists) {
+                        com.charroux.carRental.entity.Car entity = new com.charroux.carRental.entity.Car(plate, brand, 0);
+                        carRepository.save(entity);
+                    }
+                }
+            }
+            channel.shutdown();
+        } catch (Exception e) {
+            // Log and continue; failure to fetch initial cars shouldn't break application startup
+            logger.error("Failed to fetch cars from AgreementService: " + e.getMessage());
+    
+        }
     }
 
-    @Override
-    public void addCar(Car car) {
-        carRepository.save(car);
+    /**
+     * Fetch available cars from AgreementService and push their plateNumbers to WebSocket topic /topic/plates
+     */
+    public void broadcastAvailableCars() {
+        try {
+            final ManagedChannel channel = ManagedChannelBuilder.forTarget(this.customerHost + ":" + this.customerPost)
+                    .usePlaintext()
+                    .build();
+            AgreementServiceGrpc.AgreementServiceBlockingStub blockingStub = AgreementServiceGrpc.newBlockingStub(channel);
+            CarToBeRented available = blockingStub.carsToBeRented(Empty.getDefaultInstance());
+            if (available != null) {
+                for (com.charroux.lib.Car protoCar : available.getCarsList()) {
+                    String plate = protoCar.getPlateNumber();
+                    if (plate == null) plate = protoCar.getModel();
+                    logger.info("Broadcasting plateNumber via WebSocket: {}", plate);
+                    try {
+                        messagingTemplate.convertAndSend("/topic/plates", plate);
+                    } catch (Exception mex) {
+                        logger.error("Failed to send WS message: {}", mex.getMessage());
+                    }
+                }
+            }
+            channel.shutdown();
+        } catch (Exception e) {
+            logger.error("Failed to fetch/broadcast cars: {}", e.getMessage());
+        }
     }
 
     class AgreementObserver extends Thread implements StreamObserver<Agreement> {
@@ -65,7 +130,7 @@ public class RentalServiceImpl implements RentalService {
                 default:
                     rentalAgreement.setState(RentalAgreement.State.CREDIT_REJECTED);
             }
-            System.out.println("onNext client receives: " + agreement);
+            logger.info("onNext client receives: " + agreement);
         }
 
         @Override
@@ -75,7 +140,7 @@ public class RentalServiceImpl implements RentalService {
 
         @Override
         public void onCompleted() {
-            System.out.println("on completed");
+            logger.info("on completed");
             countDownLatch.countDown();
         }
 
@@ -86,7 +151,7 @@ public class RentalServiceImpl implements RentalService {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("fin run");
+            logger.info("fin run");
         }
     }
 
@@ -120,7 +185,7 @@ public class RentalServiceImpl implements RentalService {
         rentalAgreement.setState(RentalAgreement.State.PENDING);
         rentalAgreementRepository.save(rentalAgreement);
 
-        System.out.println("debut=" + rentalAgreement.hashCode() + " " + rentalAgreement);
+        logger.info("debut=" + rentalAgreement.hashCode() + " " + rentalAgreement);
 
         AgreementObserver agreementObserver = new AgreementObserver(countDownLatch, rentalAgreement);
 
@@ -132,7 +197,7 @@ public class RentalServiceImpl implements RentalService {
         for (int i=0; i<numberOfCars; i++) {
             car = cars.get(i);
             rentalAgreement.addCar(car);
-            System.out.println(car);
+            logger.info(car.toString());
             CreditApplication creditApplication = CreditApplication.newBuilder().setEmail("me@gmail.com").setPrice(car.getPrice()).build();
             carsObserver.onNext(creditApplication);
         }
@@ -176,14 +241,8 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public List<Car> carsToBeRented() {
-        List<Car> cars = new ArrayList<Car>();
-        Iterator<Car> it = carRepository.findAll().iterator();
-        while (it.hasNext()){
-            Car car = it.next();
-            if(car.getRentalAgreement() == null){
-                cars.add(car);
-            }
-        }
+        List<Car> cars = new ArrayList<>();
+        carRepository.findAll().forEach(cars::add);
         return cars;
     }
 
@@ -206,9 +265,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public RentalAgreement getAgreement(long customerId) {
-        System.out.println(customerId);
         List<RentalAgreement> agreements = rentalAgreementRepository.findByCustomerId(customerId);
-        System.out.println("size=" + agreements.size());
         RentalAgreement rentalAgreement = agreements.get(0);
         return rentalAgreement;
     }

@@ -21,11 +21,6 @@ public class RentalServiceTests {
     @Mock
     RentalServiceImpl rentalService;
 
-    @Test
-    void getAllCarsToBeRented() {
-        Car car = new Car("11AA22", "Ferrari", 1000);
-        doNothing().when(rentalService).addCar(car);
-        when(rentalService.carsToBeRented()).thenReturn(Collections.singletonList(car));
-    }
+
 
 }

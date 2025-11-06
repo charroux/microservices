@@ -259,6 +259,41 @@ Use of mocks to test service in isolation: https://github.com/charroux/serviceme
 
 Microservice tests: https://github.com/charroux/servicemesh/blob/main/carservice/src/test/java/com/charroux/carservice/web/CarRentalRestServiceTests.java
 
+### Générer le code protobuf / gRPC
+
+Le projet utilise protobuf pour définir les contracts gRPC. Le plugin Gradle génère les sources Java à partir des fichiers `.proto`.
+
+Commandes utiles :
+
+- Générer les sources protobuf pour le module `agreementService` :
+
+```bash
+./gradlew :agreementService:generateProto
+```
+
+- Générer puis compiler le module serveur (génère les sources et compile) :
+
+```bash
+./gradlew :agreementService:generateProto :agreementServiceServer:compileJava
+```
+
+- Générer et tout compiler (multi-module) :
+
+```bash
+./gradlew clean build
+```
+
+Où trouver les fichiers générés :
+
+- Par défaut dans ce projet les fichiers générés sont placés sous `agreementService/src/generated` (configuré dans `agreementService/build.gradle`).
+
+Conseils IDE / CI :
+
+- Après génération, rafraîchissez le projet Gradle dans votre IDE (IntelliJ/VS Code) pour que le répertoire `src/generated` soit reconnu comme source Java.
+- Le plugin télécharge automatiquement `protoc` et le plugin gRPC si nécessaire ; pas besoin d'installer `protoc` manuellement pour la compilation Gradle.
+- Si vous modifiez les fichiers `.proto`, regénérez les sources puis reconstruisez les modules consommateurs (ex. `agreementServiceServer`, `carRental`).
+
+
 ### Launch a workflow when the code is updated
 Check an existing workflow: https://github.com/charroux/servicemesh/actions
 
@@ -472,11 +507,70 @@ docker push charroux/postgres:15
 
 Quick dev using Docker Compose
 ---------------------------------
-For local development it's often faster to use Docker Compose. Create a `docker-compose.yml` that starts Postgres and the `car-rental` image and mounts local resources as needed. Example snippet (not included here) should:
+A ready-to-use Docker Compose file for development has been added: `docker-compose.dev.yml` and an environment file `.env.dev`.
 
-- start a Postgres container with the same credentials as `application-prod.properties` or use env overrides,
-- build or pull the `charroux/car-rental:latest` image,
-- expose port 8080 for local testing.
+Basic workflow
+1. Copy or edit the example environment file (optional):
+
+```bash
+cp .env.dev .env
+# edit .env to change POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB if needed
+```
+
+2. Start the stack (build images and run Postgres + car-rental + agreement-service):
+
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
+
+This will:
+- Build and start the Postgres database
+- Build and start the car-rental service on port 8080
+- Build and start the agreement-service (gRPC) on port 9090
+
+3. Run in detached mode:
+
+```bash
+docker compose -f docker-compose.dev.yml --env-file .env.dev up --build -d
+```
+
+4. View logs:
+
+```bash
+docker compose -f docker-compose.dev.yml logs -f car-rental
+```
+
+5. Stop and remove containers:
+
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+Rebuild only the car-rental image (no Postgres rebuild):
+
+```bash
+docker compose -f docker-compose.dev.yml build car-rental
+docker compose -f docker-compose.dev.yml up -d
+```
+
+What this compose file does
+- Starts a Postgres container (`postgres:15`) with a persistent volume `postgres-data`.
+- Builds the `car-rental` image from `carRental/Dockerfile` and runs it with `SPRING_PROFILES_ACTIVE=prod` so the app will read Postgres connection settings from the `SPRING_DATASOURCE_*` env vars provided by compose.
+- Builds and starts the `agreement-service` gRPC server from `agreementServiceServer/Dockerfile`.
+- Exposes the following ports on the host:
+  - `8080`: car-rental REST API
+  - `9090`: agreement-service gRPC endpoint
+
+Healthchecks and caveats
+- The `docker-compose.dev.yml` includes healthchecks for Postgres and the `car-rental` service. The car-rental healthcheck calls the actuator `/actuator/health` endpoint. If your runtime image does not include `curl`, the healthcheck may fail — in that case either:
+    - install `curl` in the runtime image, or
+    - change the healthcheck to use a simple TCP check (nc) or remove it for local development, or
+    - run the app with a mounted development image that includes curl.
+
+Environment overrides
+- You can override any Spring property by passing environment variables in the compose file (already wired for the datasource). For production, prefer using a secret manager or Kubernetes Secrets instead of plain env files.
+
+Docker Compose is suitable for quick local development. For CI and production use Kubernetes manifests in `k8s/`.
 
 Kubernetes
 -----------

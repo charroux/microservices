@@ -24,6 +24,31 @@ public final class AgreementServiceProto {
   static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_charroux_Agreement_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_charroux_Bidding_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_charroux_Bidding_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_charroux_BidResponse_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_charroux_BidResponse_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_charroux_Car_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_charroux_Car_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_charroux_Bidder_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_charroux_Bidder_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_charroux_CarToBeRented_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_charroux_CarToBeRented_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -33,18 +58,31 @@ public final class AgreementServiceProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\026agreementService.proto\022\014com.charroux\"V" +
-      "\n\021CreditApplication\022\021\n\tfirstName\030\001 \001(\t\022\020" +
-      "\n\010lastName\030\002 \001(\t\022\r\n\005email\030\003 \001(\t\022\r\n\005price" +
-      "\030\004 \001(\r\"(\n\tAgreement\022\033\n\023creditReservedEve" +
-      "nt\030\001 \001(\t2^\n\020AgreementService\022J\n\010RentCars" +
-      "\022\037.com.charroux.CreditApplication\032\027.com." +
-      "charroux.Agreement\"\000(\0010\001B+\n\020com.charroux" +
-      ".libB\025AgreementServiceProtoP\001b\006proto3"
+      "\n\026agreementService.proto\022\014com.charroux\032\033" +
+      "google/protobuf/empty.proto\"V\n\021CreditApp" +
+      "lication\022\021\n\tfirstName\030\001 \001(\t\022\020\n\010lastName\030" +
+      "\002 \001(\t\022\r\n\005email\030\003 \001(\t\022\r\n\005price\030\004 \001(\r\"(\n\tA" +
+      "greement\022\033\n\023creditReservedEvent\030\001 \001(\t\"_\n" +
+      "\007Bidding\022\036\n\003car\030\001 \001(\0132\021.com.charroux.Car" +
+      "\022$\n\006bidder\030\002 \001(\0132\024.com.charroux.Bidder\022\016" +
+      "\n\006amount\030\003 \001(\r\"J\n\013BidResponse\022\017\n\007awarded" +
+      "\030\001 \001(\010\022\023\n\013plateNumber\030\002 \001(\t\022\025\n\rlatestBid" +
+      "ding\030\003 \001(\r\"8\n\003Car\022\r\n\005brand\030\001 \001(\t\022\r\n\005mode" +
+      "l\030\002 \001(\t\022\023\n\013plateNumber\030\003 \001(\t\"\024\n\006Bidder\022\n" +
+      "\n\002id\030\001 \001(\r\"0\n\rCarToBeRented\022\037\n\004cars\030\001 \003(" +
+      "\0132\021.com.charroux.Car2\347\001\n\020AgreementServic" +
+      "e\022H\n\010RentCars\022\037.com.charroux.CreditAppli" +
+      "cation\032\027.com.charroux.Agreement(\0010\001\022B\n\nC" +
+      "arAuction\022\025.com.charroux.Bidding\032\031.com.c" +
+      "harroux.BidResponse(\0010\001\022E\n\016CarsToBeRente" +
+      "d\022\026.google.protobuf.Empty\032\033.com.charroux" +
+      ".CarToBeRentedB+\n\020com.charroux.libB\025Agre" +
+      "ementServiceProtoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          com.google.protobuf.EmptyProto.getDescriptor(),
         });
     internal_static_com_charroux_CreditApplication_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -58,6 +96,37 @@ public final class AgreementServiceProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_charroux_Agreement_descriptor,
         new java.lang.String[] { "CreditReservedEvent", });
+    internal_static_com_charroux_Bidding_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_com_charroux_Bidding_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_charroux_Bidding_descriptor,
+        new java.lang.String[] { "Car", "Bidder", "Amount", });
+    internal_static_com_charroux_BidResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_com_charroux_BidResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_charroux_BidResponse_descriptor,
+        new java.lang.String[] { "Awarded", "PlateNumber", "LatestBidding", });
+    internal_static_com_charroux_Car_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_com_charroux_Car_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_charroux_Car_descriptor,
+        new java.lang.String[] { "Brand", "Model", "PlateNumber", });
+    internal_static_com_charroux_Bidder_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_com_charroux_Bidder_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_charroux_Bidder_descriptor,
+        new java.lang.String[] { "Id", });
+    internal_static_com_charroux_CarToBeRented_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_com_charroux_CarToBeRented_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_charroux_CarToBeRented_descriptor,
+        new java.lang.String[] { "Cars", });
+    com.google.protobuf.EmptyProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

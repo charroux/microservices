@@ -1,9 +1,10 @@
-import {Component, OnInit, inject} from '@angular/core';
+import {Component, OnInit, OnDestroy, inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RentalService} from '../rental.service';
 import { Subscription } from 'rxjs';
 import {CarDetailComponent} from '../car-detail/car-detail.component';
 import {Cardetail} from '../cardetail';
+import {WebSocketService} from '../websocket.service';
 
 @Component({
   selector: 'app-car',
@@ -27,11 +28,41 @@ export class CarComponent implements OnInit {
   cardetailList: Cardetail[] = [];
   filteredCarList: Cardetail[] = [];
   rentalService: RentalService = inject(RentalService);
+  webSocketService: WebSocketService = inject(WebSocketService);
   private subscription!: Subscription;
+  private wsSubscription!: Subscription;
 
   ngOnInit() {
-    this.subscription = this.rentalService.getAllCars().subscribe(cars => { this.cardetailList = cars; this.filteredCarList = cars; });
+    this.subscription = this.rentalService.getAllCars().subscribe(cars => { 
+      this.cardetailList = cars; 
+      this.filteredCarList = cars; 
+    });
+
+    // Connect to WebSocket
+    this.webSocketService.connect();
+
+    // Subscribe to real-time updates
+    this.wsSubscription = this.webSocketService.getPlateNumberUpdates().subscribe(update => {
+      if (update) {
+        // Update the car in the lists if it exists
+        this.updateCarInLists(update);
+      }
+    });
+  }
+
+  private updateCarInLists(updatedCar: Cardetail) {
+    // Update in main list
+    const mainIndex = this.cardetailList.findIndex(car => car.plateNumber === updatedCar.plateNumber);
+    if (mainIndex !== -1) {
+      this.cardetailList[mainIndex] = { ...this.cardetailList[mainIndex], ...updatedCar };
     }
+
+    // Update in filtered list
+    const filteredIndex = this.filteredCarList.findIndex(car => car.plateNumber === updatedCar.plateNumber);
+    if (filteredIndex !== -1) {
+      this.filteredCarList[filteredIndex] = { ...this.filteredCarList[filteredIndex], ...updatedCar };
+    }
+  }
   
   filterResults(text: string) {
     console.log(text);
@@ -46,6 +77,8 @@ export class CarComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();
+    this.wsSubscription?.unsubscribe();
+    this.webSocketService.disconnect();
   }
 }
 

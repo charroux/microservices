@@ -46,6 +46,68 @@ public final class AgreementServiceGrpc {
     return getRentCarsMethod;
   }
 
+  private static volatile io.grpc.MethodDescriptor<com.charroux.lib.Bidding,
+      com.charroux.lib.BidResponse> getCarAuctionMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "CarAuction",
+      requestType = com.charroux.lib.Bidding.class,
+      responseType = com.charroux.lib.BidResponse.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
+  public static io.grpc.MethodDescriptor<com.charroux.lib.Bidding,
+      com.charroux.lib.BidResponse> getCarAuctionMethod() {
+    io.grpc.MethodDescriptor<com.charroux.lib.Bidding, com.charroux.lib.BidResponse> getCarAuctionMethod;
+    if ((getCarAuctionMethod = AgreementServiceGrpc.getCarAuctionMethod) == null) {
+      synchronized (AgreementServiceGrpc.class) {
+        if ((getCarAuctionMethod = AgreementServiceGrpc.getCarAuctionMethod) == null) {
+          AgreementServiceGrpc.getCarAuctionMethod = getCarAuctionMethod =
+              io.grpc.MethodDescriptor.<com.charroux.lib.Bidding, com.charroux.lib.BidResponse>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CarAuction"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.charroux.lib.Bidding.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.charroux.lib.BidResponse.getDefaultInstance()))
+              .setSchemaDescriptor(new AgreementServiceMethodDescriptorSupplier("CarAuction"))
+              .build();
+        }
+      }
+    }
+    return getCarAuctionMethod;
+  }
+
+  private static volatile io.grpc.MethodDescriptor<com.google.protobuf.Empty,
+      com.charroux.lib.CarToBeRented> getCarsToBeRentedMethod;
+
+  @io.grpc.stub.annotations.RpcMethod(
+      fullMethodName = SERVICE_NAME + '/' + "CarsToBeRented",
+      requestType = com.google.protobuf.Empty.class,
+      responseType = com.charroux.lib.CarToBeRented.class,
+      methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
+  public static io.grpc.MethodDescriptor<com.google.protobuf.Empty,
+      com.charroux.lib.CarToBeRented> getCarsToBeRentedMethod() {
+    io.grpc.MethodDescriptor<com.google.protobuf.Empty, com.charroux.lib.CarToBeRented> getCarsToBeRentedMethod;
+    if ((getCarsToBeRentedMethod = AgreementServiceGrpc.getCarsToBeRentedMethod) == null) {
+      synchronized (AgreementServiceGrpc.class) {
+        if ((getCarsToBeRentedMethod = AgreementServiceGrpc.getCarsToBeRentedMethod) == null) {
+          AgreementServiceGrpc.getCarsToBeRentedMethod = getCarsToBeRentedMethod =
+              io.grpc.MethodDescriptor.<com.google.protobuf.Empty, com.charroux.lib.CarToBeRented>newBuilder()
+              .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "CarsToBeRented"))
+              .setSampledToLocalTracing(true)
+              .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.google.protobuf.Empty.getDefaultInstance()))
+              .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
+                  com.charroux.lib.CarToBeRented.getDefaultInstance()))
+              .setSchemaDescriptor(new AgreementServiceMethodDescriptorSupplier("CarsToBeRented"))
+              .build();
+        }
+      }
+    }
+    return getCarsToBeRentedMethod;
+  }
+
   /**
    * Creates a new async stub that supports all call types for the service
    */
@@ -100,6 +162,20 @@ public final class AgreementServiceGrpc {
         io.grpc.stub.StreamObserver<com.charroux.lib.Agreement> responseObserver) {
       return io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall(getRentCarsMethod(), responseObserver);
     }
+
+    /**
+     */
+    default io.grpc.stub.StreamObserver<com.charroux.lib.Bidding> carAuction(
+        io.grpc.stub.StreamObserver<com.charroux.lib.BidResponse> responseObserver) {
+      return io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall(getCarAuctionMethod(), responseObserver);
+    }
+
+    /**
+     */
+    default void carsToBeRented(com.google.protobuf.Empty request,
+        io.grpc.stub.StreamObserver<com.charroux.lib.CarToBeRented> responseObserver) {
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getCarsToBeRentedMethod(), responseObserver);
+    }
   }
 
   /**
@@ -136,6 +212,22 @@ public final class AgreementServiceGrpc {
       return io.grpc.stub.ClientCalls.asyncBidiStreamingCall(
           getChannel().newCall(getRentCarsMethod(), getCallOptions()), responseObserver);
     }
+
+    /**
+     */
+    public io.grpc.stub.StreamObserver<com.charroux.lib.Bidding> carAuction(
+        io.grpc.stub.StreamObserver<com.charroux.lib.BidResponse> responseObserver) {
+      return io.grpc.stub.ClientCalls.asyncBidiStreamingCall(
+          getChannel().newCall(getCarAuctionMethod(), getCallOptions()), responseObserver);
+    }
+
+    /**
+     */
+    public void carsToBeRented(com.google.protobuf.Empty request,
+        io.grpc.stub.StreamObserver<com.charroux.lib.CarToBeRented> responseObserver) {
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
+          getChannel().newCall(getCarsToBeRentedMethod(), getCallOptions()), request, responseObserver);
+    }
   }
 
   /**
@@ -152,6 +244,13 @@ public final class AgreementServiceGrpc {
     protected AgreementServiceBlockingStub build(
         io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       return new AgreementServiceBlockingStub(channel, callOptions);
+    }
+
+    /**
+     */
+    public com.charroux.lib.CarToBeRented carsToBeRented(com.google.protobuf.Empty request) {
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
+          getChannel(), getCarsToBeRentedMethod(), getCallOptions(), request);
     }
   }
 
@@ -170,9 +269,19 @@ public final class AgreementServiceGrpc {
         io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       return new AgreementServiceFutureStub(channel, callOptions);
     }
+
+    /**
+     */
+    public com.google.common.util.concurrent.ListenableFuture<com.charroux.lib.CarToBeRented> carsToBeRented(
+        com.google.protobuf.Empty request) {
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
+          getChannel().newCall(getCarsToBeRentedMethod(), getCallOptions()), request);
+    }
   }
 
-  private static final int METHODID_RENT_CARS = 0;
+  private static final int METHODID_CARS_TO_BE_RENTED = 0;
+  private static final int METHODID_RENT_CARS = 1;
+  private static final int METHODID_CAR_AUCTION = 2;
 
   private static final class MethodHandlers<Req, Resp> implements
       io.grpc.stub.ServerCalls.UnaryMethod<Req, Resp>,
@@ -191,6 +300,10 @@ public final class AgreementServiceGrpc {
     @java.lang.SuppressWarnings("unchecked")
     public void invoke(Req request, io.grpc.stub.StreamObserver<Resp> responseObserver) {
       switch (methodId) {
+        case METHODID_CARS_TO_BE_RENTED:
+          serviceImpl.carsToBeRented((com.google.protobuf.Empty) request,
+              (io.grpc.stub.StreamObserver<com.charroux.lib.CarToBeRented>) responseObserver);
+          break;
         default:
           throw new AssertionError();
       }
@@ -204,6 +317,9 @@ public final class AgreementServiceGrpc {
         case METHODID_RENT_CARS:
           return (io.grpc.stub.StreamObserver<Req>) serviceImpl.rentCars(
               (io.grpc.stub.StreamObserver<com.charroux.lib.Agreement>) responseObserver);
+        case METHODID_CAR_AUCTION:
+          return (io.grpc.stub.StreamObserver<Req>) serviceImpl.carAuction(
+              (io.grpc.stub.StreamObserver<com.charroux.lib.BidResponse>) responseObserver);
         default:
           throw new AssertionError();
       }
@@ -219,6 +335,20 @@ public final class AgreementServiceGrpc {
               com.charroux.lib.CreditApplication,
               com.charroux.lib.Agreement>(
                 service, METHODID_RENT_CARS)))
+        .addMethod(
+          getCarAuctionMethod(),
+          io.grpc.stub.ServerCalls.asyncBidiStreamingCall(
+            new MethodHandlers<
+              com.charroux.lib.Bidding,
+              com.charroux.lib.BidResponse>(
+                service, METHODID_CAR_AUCTION)))
+        .addMethod(
+          getCarsToBeRentedMethod(),
+          io.grpc.stub.ServerCalls.asyncUnaryCall(
+            new MethodHandlers<
+              com.google.protobuf.Empty,
+              com.charroux.lib.CarToBeRented>(
+                service, METHODID_CARS_TO_BE_RENTED)))
         .build();
   }
 
@@ -268,6 +398,8 @@ public final class AgreementServiceGrpc {
           serviceDescriptor = result = io.grpc.ServiceDescriptor.newBuilder(SERVICE_NAME)
               .setSchemaDescriptor(new AgreementServiceFileDescriptorSupplier())
               .addMethod(getRentCarsMethod())
+              .addMethod(getCarAuctionMethod())
+              .addMethod(getCarsToBeRentedMethod())
               .build();
         }
       }

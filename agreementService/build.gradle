@@ -56,6 +56,16 @@ protobuf {
 	}
 }
 
+// Ensure generated sources are visible to IDEs and downstream projects
+sourceSets {
+	main {
+		java {
+			// protoc/plugin output is configured to $projectDir/src/generated
+			srcDir "$projectDir/src/generated/main/java"
+		}
+	}
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

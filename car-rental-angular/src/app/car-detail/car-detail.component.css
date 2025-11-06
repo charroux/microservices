@@ -28,3 +28,22 @@
     content: "\203A";
     margin-left: 5px;
   }
+
+.plate-number {
+    padding: 5px 20px;
+    font-family: monospace;
+    background-color: #f0f0f0;
+    margin: 0 20px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.plate-number.updated {
+    background-color: #ffeb3b;
+    animation: highlight 1s ease-out;
+}
+
+@keyframes highlight {
+    0% { background-color: #ffeb3b; }
+    100% { background-color: #f0f0f0; }
+}
